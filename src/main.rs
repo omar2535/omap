@@ -2,9 +2,9 @@ extern crate clap;
 
 use clap::{Arg, App};
 use std::net::TcpStream;
+use std::thread;
 
 fn main() {
-
     let matches = generate_cli_input();
     println!("Initializing omap port scanner");
     // unwrap to convert option enum to string
@@ -36,9 +36,11 @@ fn generate_cli_input() -> clap::ArgMatches<'static> {
 fn scan(address: &str) {
     for port_number in 0..65535 {
         let addr: String = format!("{}:{}", address, port_number);
-        println!("Scanning on: {}", addr);
-        if let Ok(_stream) = TcpStream::connect(addr) {
-            println!("Port open on: {}", port_number);
-        }
+        thread::spawn(move || {
+            // println!("Scanning on: {}", addr);
+            if let Ok(_stream) = TcpStream::connect(addr) {
+                println!("Port open on: {}", port_number);
+            } 
+        });
     }
 }
